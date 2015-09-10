@@ -43,12 +43,12 @@ abstract class XBaseAction extends BaseAction {
         $this->display(dirname(__FILE__).'/../template/jsonrespond.tpl.php');
     }
 
-    protected function displayJsonSuccess($msg = 'success', $data = null) {
+    protected function displayJsonSuccess($data = null, $msg = 'success') {
         $jsonRespond = MJsonRespond::respondSuccess($msg, $data);
         $this->displayJson($jsonRespond);
     }
 
-    protected function displayJsonFail($msg = 'fail', $data = null) {
+    protected function displayJsonFail($data = null, $msg = 'fail') {
         $jsonRespond = MJsonRespond::respondFail($msg, $data);
         $this->displayJson($jsonRespond);
     }
