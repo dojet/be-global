@@ -9,14 +9,14 @@
  */
 abstract class BaseModule {
 
-    protected static $instance;
+    protected static $arrInstance = array();
 
     private static function getInstance() {
-        if (!self::$instance) {
-            $class = get_called_class();
-            self::$instance = new $class;
+        $class = get_called_class();
+        if (!array_key_exists($class, self::$arrInstance)) {
+            self::$arrInstance[$class] = new $class;
         }
-        return self::$instance;
+        return self::$arrInstance[$class];
     }
 
     public static function module() {
