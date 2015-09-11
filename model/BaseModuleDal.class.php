@@ -98,4 +98,16 @@ abstract class BaseModuleDal extends BaseDal implements IBaseModuleDal {
         return call_user_func_array(array('parent', self::$lastQueryMethod), self::$lastArgs);
     }
 
+    protected static function rs2firstvalue($sql, $db = null, $rw = 'r') {
+        self::$lastQueryMethod = __FUNCTION__;
+        self::$lastArgs = func_get_args();
+        return call_user_func_array(array('parent', self::$lastQueryMethod), self::$lastArgs);
+    }
+
+    protected static function rs2oneColumnArray($sql, $db = null, $rw = 'r') {
+        self::$lastQueryMethod = __FUNCTION__;
+        self::$lastArgs = func_get_args();
+        return call_user_func_array(array('parent', self::$lastQueryMethod), self::$lastArgs);
+    }
+
 }
