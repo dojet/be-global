@@ -1,5 +1,5 @@
 <?php
-$__c = &Config::configRefForKeyPath('global');
+$__c = &\Dojet\Config::configRefForKeyPath('global');
 
 
 unset($__c);

@@ -7,6 +7,8 @@
  * @author liyan
  * @since 2015 7 16
  */
+namespace BEGLOBAL;
+
 abstract class BaseModule {
 
     protected static $arrInstance = array();

@@ -1,11 +1,16 @@
 <?php
-define('BEGLOBAL', dirname(__FILE__).'/');
-define('GLCONFIG', BEGLOBAL.'config/');
-define('GLMODEL', BEGLOBAL.'model/');
-define('GLLIB', BEGLOBAL.'lib/');
-define('GLUTIL', BEGLOBAL.'util/');
+namespace BEGLOBAL;
 
-DAutoloader::getInstance()->addAutoloadPathArray(
+use \Dojet\DAutoloader;
+use \Dojet\Config;
+
+define('DGLOBAL', dirname(__FILE__).'/');
+define('GLCONFIG', DGLOBAL.'config/');
+define('GLMODEL', DGLOBAL.'model/');
+define('GLLIB', DGLOBAL.'lib/');
+define('GLUTIL', DGLOBAL.'util/');
+
+DAutoloader::getInstance()->addNamespacePathArray(__NAMESPACE__,
     array(
         GLLIB,
         GLMODEL,
