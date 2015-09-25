@@ -16,8 +16,13 @@ abstract class XBaseAction extends BaseAction {
         $this->arrHeader = array();
     }
 
+    protected function templatePrefix($template) {
+        return PRJ.'template/';
+    }
+
     protected function displayTemplate($template) {
-        $template = PRJ.'template/'.$template;
+        $prefix = $this->templatePrefix($template);
+        $template = $prefix.$template;
         return $this->display($template);
     }
 
