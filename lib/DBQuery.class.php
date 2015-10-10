@@ -6,9 +6,14 @@
 class DBQuery {
 
     protected $dbConnection;
+    protected $delegate;
 
     function __construct(DBConnection $dbConnection) {
         $this->dbConnection = $dbConnection;
+    }
+
+    public function setDelegate(IDBQueryDelegate $delegate) {
+        $this->delegate = $delegate;
     }
 
     public function beginTransaction() {
@@ -32,7 +37,25 @@ class DBQuery {
     }
 
     public function doQuery($sql) {
-        return $this->dbAdapter()->query($sql);
+        $dbAdapter = $this->dbAdapter();
+        $shouldRetry = false;
+        do {
+            $ret = $dbAdapter->query($sql);
+            if (false !== $ret) {
+                break;
+            }
+
+            $delegate = $this->delegate;
+            if (!$delegate) {
+                break;
+            }
+            DAssert::assert($delegate instanceof IDBQueryDelegate, 'illegal IDBQueryDelegate');
+
+            $delegate->dbQueryFail($dbAdapter, $sql);
+            $shouldRetry = $delegate->dbQueryShouldRetry($dbAdapter, $sql);
+        } while ($shouldRetry);
+
+        return $ret;
     }
 
     public function doInsert($sql) {
