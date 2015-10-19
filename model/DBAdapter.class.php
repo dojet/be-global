@@ -17,7 +17,7 @@ abstract class DBAdapter {
     public $dbname;
     public $port;
 
-    abstract public function connect();
+    abstract public function connect($config);
     abstract public function close();
     abstract public function query($sql);
     abstract public function realEscapeString($escapestr);

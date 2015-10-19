@@ -5,8 +5,14 @@
  */
 class DBMysqli extends DBAdapter {
 
-    public function connect() {
-        $mysqli = new mysqli($this->host, $this->username, $this->password, $this->dbname, $this->port);
+    public function connect($config) {
+        $hostport = $config['hosts'][array_rand($config['hosts'])];
+        $host = $hostport['h'];
+        $port = $hostport['p'];
+        $username = $config['username'];
+        $password = $config['password'];
+        $dbname = $config['dbname'];
+        $mysqli = new mysqli($host, $username, $password, $dbname, $port);
         if ($mysqli->connect_errno) {
             throw new Exception($mysqli->connect_error, $mysqli->connect_errno);
         }

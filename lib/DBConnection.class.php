@@ -18,17 +18,9 @@ class DBConnection {
     }
 
     public function connect($config) {
-        $hostport = $config['hosts'][array_rand($config['hosts'])];
-
         $dbAdapter = $this->dbAdapter;
         try {
-            $dbAdapter->host = $hostport['h'];
-            $dbAdapter->port = $hostport['p'];
-            $dbAdapter->username = $config['username'];
-            $dbAdapter->password = $config['password'];
-            $dbAdapter->dbname = $config['dbname'];
-            $dbAdapter->connect();
-
+            $dbAdapter->connect($config);
             $dbAdapter->query('SET NAMES "UTF8"');
         } catch (Exception $e) {
             throw new Exception("connect db failed", 1);
