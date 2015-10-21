@@ -9,7 +9,7 @@
  */
 abstract class BaseModuleDal extends BaseDal implements IBaseModuleDal, IDBQueryDelegate {
 
-    protected static $tryCreateTable = false;
+    protected $tryCreateTable = false;
 
     protected static function defaultDB() {
         $module = static::module();
@@ -28,12 +28,12 @@ abstract class BaseModuleDal extends BaseDal implements IBaseModuleDal, IDBQuery
     }
 
     public function dbQueryShouldRetry(DBAdapter $adapter, $sql) {
-        if (static::$tryCreateTable) {
+        if ($this->tryCreateTable) {
             return false;
         }
 
         if (1146 == $adapter->errno()) {   # Table doesn't exist, errno: 1146
-            static::$tryCreateTable = true;
+            $this->tryCreateTable = true;
             static::createTable();
             return true;
         }
