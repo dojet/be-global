@@ -10,8 +10,7 @@
 abstract class BaseModule {
 
     public static function module() {
-        $module = SingletonFactory::getInstance(get_called_class());
-        return $module;
+        return SingletonFactory::getInstance(get_called_class());
     }
 
     public static function init() {

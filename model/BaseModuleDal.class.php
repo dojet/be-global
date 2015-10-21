@@ -19,7 +19,6 @@ abstract class BaseModuleDal extends BaseDal implements IBaseModuleDal, IDBQuery
 
     public static function getDBQuery($db = null, $rw = 'w') {
         $dbQuery = parent::getDBQuery($db, $rw);
-        $className = get_called_class();
         $dbQuery->setDelegate(new static);
         return $dbQuery;
     }
@@ -30,7 +29,6 @@ abstract class BaseModuleDal extends BaseDal implements IBaseModuleDal, IDBQuery
 
     public function dbQueryShouldRetry(DBAdapter $adapter, $sql) {
         if (static::$tryCreateTable) {
-            static::$tryCreateTable = false;
             return false;
         }
 
