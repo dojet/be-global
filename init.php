@@ -1,4 +1,6 @@
 <?php
+include(PRJ.'../be-dojet/dojet.php');
+
 define('DGLOBAL', dirname(__FILE__).'/');
 define('GLCONFIG', DGLOBAL.'config/');
 define('GLMODEL', DGLOBAL.'model/');
