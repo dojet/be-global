@@ -13,8 +13,14 @@ abstract class BaseModule {
         return SingletonFactory::getInstance(get_called_class());
     }
 
-    public static function init() {
-
+    final public static function init() {
+        $depends = $this->depends();
+        foreach ($depends as $module) {
+            $moduleInit = __DIR__.'/../'.$module.'/init.php';
+            require $moduleInit;
+        }
     }
+
+    abstract protected function depends();
 
 }

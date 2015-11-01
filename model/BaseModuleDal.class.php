@@ -34,7 +34,7 @@ abstract class BaseModuleDal extends BaseDal implements IBaseModuleDal, IDBQuery
 
         if (1146 == $adapter->errno()) {   # Table doesn't exist, errno: 1146
             $this->tryCreateTable = true;
-            static::createTable();
+            static::init();
             return true;
         }
 

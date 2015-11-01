@@ -1,6 +1,5 @@
 <?php
 /**
- * DBHelper
  *
  * @author liyan
  * @since 2015 7 16

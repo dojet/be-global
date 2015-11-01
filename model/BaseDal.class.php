@@ -35,12 +35,6 @@ abstract class BaseDal {
         return $ret;
     }
 
-    protected static function rs2foundrows($db = null, $rw = 'r') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        $ret = $dbQuery->rs2foundrows();
-        return static::result($ret, $dbQuery);
-    }
-
     protected static function doDelete($sql, $db = null, $rw = 'w') {
         $dbQuery = static::getDBQuery($db, $rw);
         $ret = $dbQuery->doDelete($sql);
@@ -95,6 +89,12 @@ abstract class BaseDal {
     protected static function rs2rowcount($sql, $db = null, $rw = 'r') {
         $dbQuery = static::getDBQuery($db, $rw);
         $ret = $dbQuery->rs2rowcount($sql);
+        return static::result($ret, $dbQuery);
+    }
+
+    protected static function rs2foundrows($db = null, $rw = 'r') {
+        $dbQuery = static::getDBQuery($db, $rw);
+        $ret = $dbQuery->rs2foundrows();
         return static::result($ret, $dbQuery);
     }
 

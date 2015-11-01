@@ -5,7 +5,7 @@
  */
 interface IBaseModuleDal {
 
-    static function createTable();
+    static function init();
 
     static function module();
 
