@@ -1,4 +1,4 @@
 <?php
-DAssert::assert($tpl_jsonResponse instanceof MJsonResponse);
+DAssert::assert($tpl_json instanceof MJson);
 
-print $tpl_jsonResponse->toJson();
+print $tpl_json->toJson();

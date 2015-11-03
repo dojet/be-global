@@ -42,9 +42,9 @@ abstract class XBaseAction extends BaseAction {
         return parent::display($template);
     }
 
-    protected function displayJson(MJsonResponse $jsonResponse) {
+    protected function displayJson(MJson $json) {
         $this->addHeader('Content-Type', 'application/json');
-        $this->assign('jsonResponse', $jsonResponse);
+        $this->assign('json', $json);
         $this->display(dirname(__FILE__).'/../template/jsonresponse.tpl.php');
     }
 

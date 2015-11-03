@@ -7,16 +7,25 @@
  * @author liyan
  * @since 2015 11 3
  */
-class MJsonResponse {
+class MJsonResponse extends MJson {
 
-    protected $array = array();
+    protected $errno;
+    protected $message;
+    protected $data;
 
-    function __construct($array) {
-        $this->array = $array;
+    const SUCCESS = 0;
+    const FAIL = 1;
+
+    public static function response($errno, $message, $data) {
+        return new MJsonResponse(array('errno' => $errno, 'message' => $message, 'data' => $data));
     }
 
-    public function toJson() {
-        return json_encode($this->array);
+    public static function responseSuccess($message, $data) {
+        return MJsonResponse::response(self::SUCCESS, $message, $data);
+    }
+
+    public static function responseFail($message, $data) {
+        return MJsonResponse::response(self::FAIL, $message, $data);
     }
 
 }
