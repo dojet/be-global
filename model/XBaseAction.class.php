@@ -42,20 +42,20 @@ abstract class XBaseAction extends BaseAction {
         return parent::display($template);
     }
 
-    protected function displayJson(MJsonRespond $jsonRespond) {
+    protected function displayJson(MJsonResponse $jsonResponse) {
         $this->addHeader('Content-Type', 'application/json');
-        $this->assign('jsonRespond', $jsonRespond);
-        $this->display(dirname(__FILE__).'/../template/jsonrespond.tpl.php');
+        $this->assign('jsonResponse', $jsonResponse);
+        $this->display(dirname(__FILE__).'/../template/jsonresponse.tpl.php');
     }
 
-    protected function displayJsonSuccess($data = null, $msg = 'success') {
-        $jsonRespond = MJsonRespond::respondSuccess($msg, $data);
-        $this->displayJson($jsonRespond);
+    protected function displayJsonSuccess($data = null, $message = 'success') {
+        $jsonResponse = MJsonResponse::responseSuccess($message, $data);
+        $this->displayJson($jsonResponse);
     }
 
-    protected function displayJsonFail($data = null, $msg = 'fail') {
-        $jsonRespond = MJsonRespond::respondFail($msg, $data);
-        $this->displayJson($jsonRespond);
+    protected function displayJsonFail($data = null, $message = 'fail') {
+        $jsonResponse = MJsonResponse::responseFail($message, $data);
+        $this->displayJson($jsonResponse);
     }
 
     protected function displayDebug() {

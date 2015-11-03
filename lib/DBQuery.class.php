@@ -52,7 +52,6 @@ class DBQuery {
             }
             DAssert::assert($delegate instanceof IDBQueryDelegate, 'illegal IDBQueryDelegate');
 
-            $delegate->dbQueryFail($dbAdapter, $sql);
             $shouldRetry = $delegate->dbQueryShouldRetry($dbAdapter, $sql);
         } while ($shouldRetry);
 

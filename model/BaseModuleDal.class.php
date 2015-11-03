@@ -23,10 +23,6 @@ abstract class BaseModuleDal extends BaseDal implements IBaseModuleDal, IDBQuery
         return $dbQuery;
     }
 
-    public function dbQueryFail(DBAdapter $adapter, $sql) {
-
-    }
-
     public function dbQueryShouldRetry(DBAdapter $adapter, $sql) {
         if ($this->tryCreateTable) {
             return false;

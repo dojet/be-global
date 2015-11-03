@@ -1,5 +1,5 @@
 <?php
-include(PRJ.'../be-dojet/dojet.php');
+include(dirname(__FILE__).'/../be-dojet/dojet.php');
 
 define('DGLOBAL', dirname(__FILE__).'/');
 define('GLCONFIG', DGLOBAL.'config/');
@@ -14,5 +14,3 @@ DAutoloader::getInstance()->addAutoloadPathArray(
         GLUTIL,
     )
 );
-
-Config::loadConfig(GLCONFIG.'global');

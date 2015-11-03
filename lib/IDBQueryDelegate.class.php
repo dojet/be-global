@@ -6,7 +6,6 @@
  */
 interface IDBQueryDelegate {
 
-    public function dbQueryFail(DBAdapter $adapter, $sql);
     public function dbQueryShouldRetry(DBAdapter $adapter, $sql);
 
 }

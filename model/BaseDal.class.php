@@ -30,7 +30,7 @@ abstract class BaseDal {
 
     protected static function result($ret, DBQuery $dbQuery) {
         if (false === $ret) {
-            throw new DBException($dbQuery->error(), $dbQuery->errno());
+            throw new Exception($dbQuery->error(), $dbQuery->errno());
         }
         return $ret;
     }
