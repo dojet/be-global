@@ -2,12 +2,12 @@
 /**
  * dal base
  *
- * Filename: BaseDal.class.php
+ * Filename: MysqlDal.class.php
  *
  * @author liyan
  * @since 2014 4 24
  */
-abstract class BaseDal {
+abstract class MysqlDal {
 
     protected static function defaultDB() {
         return null;

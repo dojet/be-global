@@ -7,7 +7,7 @@
  * @author liyan
  * @since 2015 7 16
  */
-abstract class BaseModuleDal extends BaseDal implements IBaseModuleDal, IDBQueryDelegate {
+abstract class BaseModuleDal extends MysqlDal implements IBaseModuleDal, IDBQueryDelegate {
 
     protected $tryCreateTable = false;
 
