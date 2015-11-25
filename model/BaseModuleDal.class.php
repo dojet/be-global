@@ -39,7 +39,7 @@ abstract class BaseModuleDal extends MysqlDal implements IBaseModuleDal, IDBQuer
 
     protected static function doCreateTable($sql, $db = null) {
         $dbQuery = static::getDBQuery($db, 'w');
-        $ret = $dbQuery->doCreateTable($sql);
+        $ret = $dbQuery->doQuery($sql);
         return static::result($ret, $dbQuery);
     }
 
