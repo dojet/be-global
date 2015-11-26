@@ -11,6 +11,7 @@ abstract class MysqlDal {
 
     protected static $cache = array();
     protected static $useCache = false;
+    protected static $forceReload = false;
 
     protected static function defaultDB() {
         return null;
@@ -40,6 +41,10 @@ abstract class MysqlDal {
 
     protected static function setUseCache($useCache) {
         self::$useCache = $useCache;
+    }
+
+    public static function setForceReload($forceReload) {
+        self::$forceReload = $forceReload;
     }
 
     private static function doQuery($sql, $db, $rw) {
@@ -75,10 +80,9 @@ abstract class MysqlDal {
     protected static function rs2array($sql, $db = null, $rw = 'r') {
         if (self::$useCache) {
             $key = sha1(serialize($sql, $db, $rw));
-            if (isset(self::$cache[$key])) {
+            if (!self::$forceReload && isset(self::$cache[$key])) {
                 return self::$cache[$key];
             }
-
         }
 
         $rs = self::doSelect($sql, $db, $rw);
