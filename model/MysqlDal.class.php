@@ -9,6 +9,9 @@
  */
 abstract class MysqlDal {
 
+    protected static $cache = array();
+    protected static $useCache = false;
+
     protected static function defaultDB() {
         return null;
     }
@@ -35,107 +38,96 @@ abstract class MysqlDal {
         return $ret;
     }
 
-    protected static function doSelect($sql, $db = null, $rw = 'r') {
+    protected static function setUseCache($useCache) {
+        self::$useCache = $useCache;
+    }
+
+    private static function doQuery($sql, $db, $rw) {
         $dbQuery = static::getDBQuery($db, $rw);
         $ret = $dbQuery->doQuery($sql);
         return static::result($ret, $dbQuery);
+    }
+
+    protected static function doSelect($sql, $db = null, $rw = 'r') {
+        $ret = self::doQuery($sql, $db, $rw);
+        return $ret;
     }
 
     protected static function doInsert($table, $fields_values, $db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
         $sql = self::insertStatement($table, $fields_values);
-        $ret = $dbQuery->doQuery($sql);
-        return static::result($ret, $dbQuery);
+        return self::doQuery($sql, $db, $rw);
     }
 
     protected static function doUpdate($table, $updates, $where, $limit = 0x7fffffff, $db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
         $sql = self::updateStatement($table, $updates, $where, $limit);
-        $ret = $dbQuery->doQuery($sql);
-        return static::result($ret, $dbQuery);
+        return self::doQuery($sql, $db, $rw);
     }
 
     protected static function doInsertUpdate($table, $arrIns, $arrUpd, $db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
         $sql = self::insertOrUpdateStatement($table, $arrIns, $arrUpd);
-        $ret = $dbQuery->doQuery($sql);
-        return static::result($ret, $dbQuery);
+        return self::doQuery($sql, $db, $rw);
     }
 
     protected static function doDelete($sql, $db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        $ret = $dbQuery->doQuery($sql);
-        return static::result($ret, $dbQuery);
+        return self::doQuery($sql, $db, $rw);
     }
 
     protected static function rs2array($sql, $db = null, $rw = 'r') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        $rs = self::doSelect($sql);
-        if (false === $rs) {
-            return false;
-        }
-        $ret = array();
-        if ($rs) {
-            while ($row = $rs->fetch_assoc()) {
-                $ret[] = $row;
+        if (self::$useCache) {
+            $key = sha1(serialize($sql, $db, $rw));
+            if (isset(self::$cache[$key])) {
+                return self::$cache[$key];
             }
+
         }
-        return static::result($ret, $dbQuery);
+
+        $rs = self::doSelect($sql, $db, $rw);
+        $ret = array();
+        while ($row = $rs->fetch_assoc()) {
+            $ret[] = $row;
+        }
+
+        if (self::$useCache) {
+            self::$cache[$key] = $ret;
+        }
+        return $ret;
     }
 
     protected static function rs2keyarray($sql, $key, $db = null, $rw = 'r') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        while (!($ret = false)) {
-            $rs = self::doSelect($sql, $db, $rw);
-            if (false === $rs) {
-                break;
-            }
-            $ret = array();
-            if ($rs) {
-                while ($row = $rs->fetch_assoc()) {
-                    $resultKey = $row[$key];
-                    $ret[$resultKey] = $row;
-                }
-            }
+        $list = self::rs2array($sql, $db, $rw);
+        $ret = array();
+        foreach ($list as $row) {
+            $ret[$row[$key]] = $row;
         }
-        return static::result($ret, $dbQuery);
+        return $ret;
     }
 
     protected static function rs2grouparray($sql, $groupkey, $rowkey = null, $db = null, $rw = 'r') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        while (!($ret = false)) {
-            $rs = self::doSelect($sql, $db, $rw);
-            if (false === $rs) {
-                break;
-            }
-            $ret = array();
-            while ($row = $rs->fetch_assoc()) {
-                $resultKey = $row[$groupkey];
-                if ($rowkey) {
-                    $ret[$resultKey][$row[$rowkey]] = $row;
-                } else {
-                    $ret[$resultKey][] = $row;
-                }
+        $list = self::rs2array($sql, $db, $rw);
+        $ret = array();
+        foreach ($list as $row) {
+            $resultKey = $row[$groupkey];
+            if ($rowkey) {
+                $ret[$resultKey][$row[$rowkey]] = $row;
+            } else {
+                $ret[$resultKey][] = $row;
             }
         }
-        return static::result($ret, $dbQuery);
+        return $ret;
     }
 
     protected static function rs2rowline($sql, $db = null, $rw = 'r') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        while (!($ret = false)) {
-            $rs = self::doSelect($sql);
-            if (false === $rs) {
-                break;
-            }
+        $list = self::rs2array($sql, $db, $rw);
+        return array_shift($list);
+    }
 
-            $ret = $rs->fetch_assoc();
-            if (false === $ret) {
-                $ret = null;
-            }
-            break;
+    protected static function rs2firstvalue($sql, $db = null, $rw = 'r') {
+        $row = self::rs2rowline($sql, $db, $rw);
+        $ret = null;
+        if (is_array($row)) {
+            $ret = array_shift($row);
         }
-        return static::result($ret, $dbQuery);
+        return $ret;
     }
 
     protected static function rs2rowcount($sql, $db = null, $rw = 'r') {
@@ -143,48 +135,16 @@ abstract class MysqlDal {
     }
 
     protected static function rs2foundrows($db = null, $rw = 'r') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        $ret = self::rs2firstvalue("SELECT FOUND_ROWS()");
-        return static::result($ret, $dbQuery);
-    }
-
-    protected static function rs2firstvalue($sql, $db = null, $rw = 'r') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        $row = self::rs2rowline($sql);
-        while (!($ret = false)) {
-            if (false === $row) {
-                break;
-            } elseif (null === $row) {
-                $ret = null;
-                break;
-            }
-
-            if (!is_array($row)) {
-                break;
-            }
-
-            $ret = array_values($row);
-            $ret = $ret[0];
-            break;
-        }
-        return static::result($ret, $dbQuery);
+        return self::rs2firstvalue("SELECT FOUND_ROWS()", $db, $rw);
     }
 
     protected static function rs2oneColumnArray($sql, $db = null, $rw = 'r') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        while (!($ret = false)) {
-            $rs = self::doSelect($sql, $db, $rw);
-            if (false === $rs) {
-                break;
-            }
-            $ret = array();
-            if ($rs) {
-                while ($row = $rs->fetch_row()) {
-                    $ret[] = $row[0];
-                }
-            }
+        $list = self::rs2array($sql, $db, $rw);
+        $ret = array();
+        foreach ($list as $row) {
+            $ret[] = array_shift($row);
         }
-        return static::result($ret, $dbQuery);
+        return $ret;
     }
 
     protected static function realEscapeString(&$str, $db = null, $rw = 'r') {
@@ -194,9 +154,7 @@ abstract class MysqlDal {
     }
 
     protected static function insertID($db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        $ret = $dbQuery->insertID();
-        return static::result($ret, $dbQuery);
+        return static::doQuery("SELECT LAST_INSERT_ID()", $db, $rw);
     }
 
     protected static function affectedRows($db = null, $rw = 'w') {
@@ -206,23 +164,19 @@ abstract class MysqlDal {
     }
 
     protected static function beginTransaction($db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        return $dbQuery->doQuery('BEGIN');
+        return static::doQuery('BEGIN', $db, $rw);
     }
 
     protected static function endTransaction($db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        return $dbQuery->doQuery('END');
+        return static::doQuery('END', $db, $rw);
     }
 
     protected static function commit($db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        return $dbQuery->doQuery('COMMIT');
+        return static::doQuery('COMMIT', $db, $rw);
     }
 
     protected static function rollback($db = null, $rw = 'w') {
-        $dbQuery = static::getDBQuery($db, $rw);
-        return $dbQuery->doQuery('ROLLBACK');
+        return static::doQuery('ROLLBACK', $db, $rw);
     }
 
     ##
@@ -233,7 +187,7 @@ abstract class MysqlDal {
         $arrayValues = array();
         foreach ($fields_values as $field => $value) {
             $arrayFields[] = '`'.$field.'`';
-            $arrayValues[] = "'".self::realEscapeString($value)."'";
+            $arrayValues[] = "'".static::realEscapeString($value)."'";
         }
         $strFields = join(', ', $arrayFields);
         $strValues = join(', ', $arrayValues);
@@ -246,14 +200,14 @@ abstract class MysqlDal {
         $arrayValues = array();
         foreach ($fields_values as $field => $value) {
             $arrayFields[] = '`'.$field.'`';
-            $arrayValues[] = "'".self::realEscapeString($value)."'";
+            $arrayValues[] = "'".static::realEscapeString($value)."'";
         }
         $strFields = join(', ', $arrayFields);
         $strValues = join(', ', $arrayValues);
 
         $arrayUpdates = array();
         foreach ($updates as $upKey => $upValue) {
-            $arrayUpdates[] = self::updateOption($upKey, $upValue);
+            $arrayUpdates[] = static::updateOption($upKey, $upValue);
         }
         $strUpdates = join(', ', $arrayUpdates);
 
@@ -267,7 +221,7 @@ abstract class MysqlDal {
     protected static function updateStatement($table, $updates, $where, $limit = 0x7fffffff) {
         $arrayUpdates = array();
         foreach ($updates as $upKey => $upValue) {
-            $arrayUpdates[] = self::updateOption($upKey, $upValue);
+            $arrayUpdates[] = static::updateOption($upKey, $upValue);
         }
         $strUpdates = join(', ', $arrayUpdates);
 
@@ -282,14 +236,14 @@ abstract class MysqlDal {
     private static function updateOption($upKey, $upValue) {
         $statement = null;
 
-        $realUpKey = self::realEscapeString($upKey);
+        $realUpKey = static::realEscapeString($upKey);
         if (is_array($upValue)) {
             if (array_key_exists('inc', $upValue)) {
                 $inc = $upValue['inc'];
                 $statement = "`$realUpKey`=`$realUpKey`+$inc";
             }
         } else {
-            $statement = "`".$realUpKey."`='".self::realEscapeString($upValue)."'";
+            $statement = "`".$realUpKey."`='".static::realEscapeString($upValue)."'";
         }
 
         DAssert::assert($statement !== null,
