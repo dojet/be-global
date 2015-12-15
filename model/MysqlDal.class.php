@@ -244,7 +244,8 @@ abstract class MysqlDal {
         if (is_array($upValue)) {
             if (array_key_exists('inc', $upValue)) {
                 $inc = $upValue['inc'];
-                $statement = "`$realUpKey`=`$realUpKey`+$inc";
+                DAssert::assertNumeric($inc);
+                $statement = "`$realUpKey`=`$realUpKey`+($inc)";
             }
         } else {
             $statement = "`".$realUpKey."`='".static::realEscapeString($upValue)."'";
