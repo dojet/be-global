@@ -125,7 +125,7 @@ abstract class MysqlDal {
         return array_shift($list);
     }
 
-    protected static function rs2firstvalue($sql, $db = null, $rw = 'r') {
+    protected static function rs2value($sql, $db = null, $rw = 'r') {
         $row = self::rs2rowline($sql, $db, $rw);
         $ret = null;
         if (is_array($row)) {
@@ -135,11 +135,11 @@ abstract class MysqlDal {
     }
 
     protected static function rs2rowcount($sql, $db = null, $rw = 'r') {
-        return self::rs2firstvalue($sql, $db, $rw);
+        return self::rs2value($sql, $db, $rw);
     }
 
     protected static function rs2foundrows($db = null, $rw = 'r') {
-        return self::rs2firstvalue("SELECT FOUND_ROWS()", $db, $rw);
+        return self::rs2value("SELECT FOUND_ROWS()", $db, $rw);
     }
 
     protected static function rs2oneColumnArray($sql, $db = null, $rw = 'r') {
