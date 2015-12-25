@@ -151,9 +151,9 @@ abstract class MysqlDal {
         return $ret;
     }
 
-    protected static function realEscapeString(&$str, $db = null, $rw = 'r') {
+    protected static function escape(&$str, $db = null, $rw = 'r') {
         $dbQuery = static::getDBQuery($db, $rw);
-        $str = $dbQuery->realEscapeString($str);
+        $str = $dbQuery->escape($str);
         return $str;
     }
 
@@ -191,7 +191,7 @@ abstract class MysqlDal {
         $arrayValues = array();
         foreach ($fields_values as $field => $value) {
             $arrayFields[] = '`'.$field.'`';
-            $arrayValues[] = "'".static::realEscapeString($value)."'";
+            $arrayValues[] = "'".static::escape($value)."'";
         }
         $strFields = join(', ', $arrayFields);
         $strValues = join(', ', $arrayValues);
@@ -204,7 +204,7 @@ abstract class MysqlDal {
         $arrayValues = array();
         foreach ($fields_values as $field => $value) {
             $arrayFields[] = '`'.$field.'`';
-            $arrayValues[] = "'".static::realEscapeString($value)."'";
+            $arrayValues[] = "'".static::escape($value)."'";
         }
         $strFields = join(', ', $arrayFields);
         $strValues = join(', ', $arrayValues);
@@ -240,7 +240,7 @@ abstract class MysqlDal {
     private static function updateOption($upKey, $upValue) {
         $statement = null;
 
-        $realUpKey = static::realEscapeString($upKey);
+        $realUpKey = static::escape($upKey);
         if (is_array($upValue)) {
             if (array_key_exists('inc', $upValue)) {
                 $inc = $upValue['inc'];
@@ -248,7 +248,7 @@ abstract class MysqlDal {
                 $statement = "`$realUpKey`=`$realUpKey`+($inc)";
             }
         } else {
-            $statement = "`".$realUpKey."`='".static::realEscapeString($upValue)."'";
+            $statement = "`".$realUpKey."`='".static::escape($upValue)."'";
         }
 
         DAssert::assert($statement !== null,

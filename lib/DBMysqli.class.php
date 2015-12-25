@@ -29,7 +29,7 @@ class DBMysqli extends DBAdapter {
         return $this->db->query($sql);
     }
 
-    public function realEscapeString($escapestr) {
+    public function escape($escapestr) {
         return $this->db->real_escape_string($escapestr);
     }
 

@@ -20,7 +20,7 @@ abstract class DBAdapter {
     abstract public function connect($config);
     abstract public function close();
     abstract public function query($sql);
-    abstract public function realEscapeString($escapestr);
+    abstract public function escape($escapestr);
     abstract public function error();
     abstract public function errno();
     abstract public function affectedRows();

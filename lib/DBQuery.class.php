@@ -54,8 +54,8 @@ class DBQuery {
         return $this->dbAdapter()->affectedRows();
     }
 
-    public function realEscapeString($string) {
-        return $this->dbAdapter()->realEscapeString($string);
+    public function escape($string) {
+        return $this->dbAdapter()->escape($string);
     }
 
 }
