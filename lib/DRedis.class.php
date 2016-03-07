@@ -30,6 +30,15 @@ class DRedis {
         return self::$config[$key];
     }
 
+    private static function key($key) {
+        DAssert::assert(is_array(self::$config), 'config must be array');
+        $prefix = '';
+        if (array_key_exists('key_prefix', self::$config)) {
+            $prefix = self::$config['key_prefix'];
+        }
+        return $prefix.$key;
+    }
+
     protected static function getRedis() {
         if (!self::$redis) {
             $host = self::conf('host');
@@ -70,39 +79,10 @@ class DRedis {
         return false;
     }
 
-    public static function get($key) {
+    //  key
+    public static function del($key) {
         try {
-            $ret = self::getRedis()->get($key);
-        } catch (Exception $e) {
-            Trace::warn('get redis failed. error:'.$e->getMessage());
-            throw $e;
-        }
-        return $ret;
-    }
-
-    public static function set($key, $value) {
-        try {
-            $ret = self::getRedis()->set($key, $value);
-        } catch (Exception $e) {
-            Trace::warn('set redis failed. error:'.$e->getMessage());
-            throw $e;
-        }
-        return $ret;
-    }
-
-    public static function setex($key, $expire, $value) {
-        try {
-            $ret = self::getRedis()->setex($key, $expire, $value);
-        } catch (Exception $e) {
-            Trace::warn('set redis failed. error:'.$e->getMessage());
-            throw $e;
-        }
-        return $ret;
-    }
-
-    public static function delete($key) {
-        try {
-            $ret = self::getRedis()->delete($key);
+            $ret = self::getRedis()->del(self::key($key));
         } catch (Exception $e) {
             Trace::warn('delete redis key failed. error:'.$e->getMessage());
             throw $e;
@@ -112,7 +92,7 @@ class DRedis {
 
     public static function expire($key, $seconds) {
         try {
-            $ret = self::getRedis()->expire($key, $seconds);
+            $ret = self::getRedis()->expire(self::key($key), $seconds);
         } catch (Exception $e) {
             Trace::warn('expire redis key failed. error:'.$e->getMessage());
             throw $e;
@@ -120,9 +100,40 @@ class DRedis {
         return $ret;
     }
 
+    //  string
+    public static function get($key) {
+        try {
+            $ret = self::getRedis()->get(self::key($key));
+        } catch (Exception $e) {
+            Trace::warn('get redis failed. error:'.$e->getMessage());
+            throw $e;
+        }
+        return $ret;
+    }
+
+    public static function set($key, $value) {
+        try {
+            $ret = self::getRedis()->set(self::key($key), $value);
+        } catch (Exception $e) {
+            Trace::warn('set redis failed. error:'.$e->getMessage());
+            throw $e;
+        }
+        return $ret;
+    }
+
+    public static function setex($key, $expire, $value) {
+        try {
+            $ret = self::getRedis()->setex(self::key($key), $expire, $value);
+        } catch (Exception $e) {
+            Trace::warn('set redis failed. error:'.$e->getMessage());
+            throw $e;
+        }
+        return $ret;
+    }
+
     public static function decr($key) {
         try {
-            $ret = self::getRedis()->decr($key);
+            $ret = self::getRedis()->decr(self::key($key));
         } catch (Exception $e) {
             Trace::warn('decr redis key failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -132,7 +143,7 @@ class DRedis {
 
     public static function decrBy($key, $by) {
         try {
-            $ret = self::getRedis()->decrBy($key, $by);
+            $ret = self::getRedis()->decrBy(self::key($key), $by);
         } catch (Exception $e) {
             Trace::warn('decrby redis key failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -142,7 +153,7 @@ class DRedis {
 
     public static function incr($key) {
         try {
-            $ret = self::getRedis()->incr($key);
+            $ret = self::getRedis()->incr(self::key($key));
         } catch (Exception $e) {
             Trace::warn('incr redis key failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -152,7 +163,7 @@ class DRedis {
 
     public static function incrBy($key, $by) {
         try {
-            $ret = self::getRedis()->incrBy($key, $by);
+            $ret = self::getRedis()->incrBy(self::key($key), $by);
         } catch (Exception $e) {
             Trace::warn('incrby redis key failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -160,9 +171,10 @@ class DRedis {
         return $ret;
     }
 
+    //  set
     public static function sAdd($key, $member) {
         try {
-            $ret = self::getRedis()->sAdd($key, $member);
+            $ret = self::getRedis()->sAdd(self::key($key), $member);
         } catch (Exception $e) {
             Trace::warn('redis sAdd failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -172,7 +184,7 @@ class DRedis {
 
     public static function sRem($key, $member) {
         try {
-            $ret = self::getRedis()->sRem($key, $member);
+            $ret = self::getRedis()->sRem(self::key($key), $member);
         } catch (Exception $e) {
             Trace::warn('redis sRem failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -182,7 +194,7 @@ class DRedis {
 
     public static function sRandMember($key, $count = 1) {
         try {
-            $ret = self::getRedis()->sRandMember($key, $count);
+            $ret = self::getRedis()->sRandMember(self::key($key), $count);
         } catch (Exception $e) {
             Trace::warn('redis sRandMember failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -192,7 +204,7 @@ class DRedis {
 
     public static function sMembers($key) {
         try {
-            $ret = self::getRedis()->sMembers($key);
+            $ret = self::getRedis()->sMembers(self::key($key));
         } catch (Exception $e) {
             Trace::warn('redis sMembers failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -202,7 +214,7 @@ class DRedis {
 
     public static function sIsMember($key, $member) {
         try {
-            $ret = self::getRedis()->sIsMember($key, $member);
+            $ret = self::getRedis()->sIsMember(self::key($key), $member);
         } catch (Exception $e) {
             Trace::warn('redis sIsMembers failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -210,9 +222,10 @@ class DRedis {
         return $ret;
     }
 
+    //  list
     public static function ltrim($key, $from, $to) {
         try {
-            $ret = self::getRedis()->ltrim($key, $from, $to);
+            $ret = self::getRedis()->ltrim(self::key($key), $from, $to);
         } catch (Exception $e) {
             Trace::warn('redis sMembers failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -223,7 +236,7 @@ class DRedis {
 
     public static function lindex($key, $index){
         try {
-            $ret = self::getRedis()->lindex($key, $index);
+            $ret = self::getRedis()->lindex(self::key($key), $index);
         } catch (Exception $e) {
             Trace::warn('redis lindex failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -233,7 +246,7 @@ class DRedis {
 
     public static function lrem($key, $value, $count){
         try {
-            $ret = self::getRedis()->lrem($key, $value, $count);
+            $ret = self::getRedis()->lrem(self::key($key), $value, $count);
         } catch (Exception $e) {
             Trace::warn('redis lrem failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -243,7 +256,7 @@ class DRedis {
 
     public static function llen($key){
         try {
-            $ret = self::getRedis()->llen($key);
+            $ret = self::getRedis()->llen(self::key($key));
         } catch (Exception $e) {
             Trace::warn('redis llen failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -253,7 +266,7 @@ class DRedis {
 
     public static function lrange($key, $start, $stop){
         try {
-            $ret = self::getRedis()->lrange($key, $start, $stop);
+            $ret = self::getRedis()->lrange(self::key($key), $start, $stop);
         } catch (Exception $e) {
             Trace::warn('redis lrange failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -263,7 +276,7 @@ class DRedis {
 
     public static function lpop($key){
         try {
-            $ret = self::getRedis()->lpop($key);
+            $ret = self::getRedis()->lpop(self::key($key));
         } catch (Exception $e) {
             Trace::warn('redis lpop failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -273,7 +286,7 @@ class DRedis {
 
     public static function rpop($key){
         try {
-            $ret = self::getRedis()->rpop($key);
+            $ret = self::getRedis()->rpop(self::key($key));
         } catch (Exception $e) {
             Trace::warn('redis rpop failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -283,7 +296,7 @@ class DRedis {
 
     public static function lpush($key, $value){
         try {
-            $ret = self::getRedis()->lpush($key, $value);
+            $ret = self::getRedis()->lpush(self::key($key), $value);
         } catch (Exception $e) {
             Trace::warn('redis lpush failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
@@ -293,7 +306,7 @@ class DRedis {
 
     public static function rpush($key, $value){
         try {
-            $ret = self::getRedis()->rpush($key, $value);
+            $ret = self::getRedis()->rpush(self::key($key), $value);
         } catch (Exception $e) {
             Trace::warn('redis rpush failed. key:'.$key.' error:'.$e->getMessage());
             throw $e;
