@@ -13,10 +13,12 @@ class DBMysqli extends DBAdapter {
         $username = $config['username'];
         $password = $config['password'];
         $dbname = $config['dbname'];
+        $charset = $config['charset'];
         $mysqli = new mysqli($host, $username, $password, $dbname, $port);
         if ($mysqli->connect_errno) {
             throw new Exception($mysqli->connect_error, $mysqli->connect_errno);
         }
+        $mysqli->set_charset($charset);
         $this->db = $mysqli;
         return $this;
     }

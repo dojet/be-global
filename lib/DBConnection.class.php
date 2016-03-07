@@ -20,7 +20,6 @@ class DBConnection {
         $dbAdapter = $this->dbAdapter;
         try {
             $dbAdapter->connect($config);
-            $dbAdapter->query('SET NAMES "UTF8"');
         } catch (Exception $e) {
             throw new Exception("connect db failed", 1);
         }
