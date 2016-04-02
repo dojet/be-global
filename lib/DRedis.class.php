@@ -192,6 +192,16 @@ class DRedis {
         return $ret;
     }
 
+    public static function sCard($key) {
+        try {
+            $ret = self::getRedis()->sCard(self::key($key), $member);
+        } catch (Exception $e) {
+            Trace::warn('redis sCard failed. key:'.$key.' error:'.$e->getMessage());
+            throw $e;
+        }
+        return $ret;
+    }
+
     public static function sRandMember($key, $count = 1) {
         try {
             $ret = self::getRedis()->sRandMember(self::key($key), $count);
