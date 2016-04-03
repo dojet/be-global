@@ -47,4 +47,13 @@ class SOAResponse {
         return null;
     }
 
+    public function toJson() {
+        return json_encode(array(
+            'errno' => $this->errno(),
+            'message' => $this->message(),
+            'data' => $this->data(),
+            )
+        );
+    }
+
 }
