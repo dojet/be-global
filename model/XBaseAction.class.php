@@ -74,4 +74,3 @@ abstract class XBaseAction extends BaseAction {
     }
 
 }
-

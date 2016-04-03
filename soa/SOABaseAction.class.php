@@ -11,7 +11,7 @@ abstract class SOABaseAction extends XBaseAction {
 
     final public function execute() {
         $jsonParams = MRequest::post('params');
-        $params = json_decode($jsonParams);
+        $params = json_decode($jsonParams, true);
         if (false === $params) {
             return $this->illegalSOARequest();
         }
@@ -35,4 +35,3 @@ abstract class SOABaseAction extends XBaseAction {
     }
 
 }
-
