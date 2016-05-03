@@ -72,8 +72,8 @@ class MImage {
     }
 
     public function display() {
-        header("Content-type: image/jpeg");
-        imagejpeg($this->getImage());
+        header("Content-type: image/png");
+        imagepng($this->getImage());
     }
 
 }
