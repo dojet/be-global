@@ -53,6 +53,20 @@ class MImage {
         $this->image = $im;
     }
 
+    public function copy(MImage $src, $dst_x, $dst_y, $src_x, $src_y, $w, $h) {
+        $dst = $this->getImage();
+        return imagecopy($dst, $src->getImage(), $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+    }
+
+    public function ttftext($text, $fontfile, $size, $x, $y, $angle = 0, $rgb = 0x000000) {
+        $image = $this->getImage();
+        $r = ($rgb >> 16) & 0xff;
+        $g = ($rgb >> 8) & 0xff;
+        $b = ($rgb >> 0) & 0xff;
+        $color = imagecolorallocate($image, $r, $g, $b);
+        return imagettftext($image, $size, $angle, $x, $y, $color, $fontfile, $text);
+    }
+
     public function saveTo($path, $quality = 75) {
         imagejpeg($this->getImage(), $path, $quality);
     }
