@@ -120,13 +120,50 @@ class MImage {
         $h = $this->height() - $src_y;
         $dst->copy($this, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
 
+        $dh = $this->height() - $iy - $ih; # down height
+        $rw = $this->width() - $ix - $iw; # right width
+        $sw = $width - $ix - $rw;
+        $sh = $height - $iy - $dh;
+
         //  left
         $cw = $ix;
         $ch = $ih;
         $clip = MImage::imageWithWidthHeight($cw, $ch);
         $clip->copy($this, 0, 0, 0, $iy, $cw, $ch);
-        $clip->scale($cw, $height - $this->height() + $ih);
+        $clip->scale($cw, $sh);
         $dst->copy($clip, 0, $iy, 0, 0, $clip->width(), $clip->height());
+
+        //  top
+        $cw = $iw;
+        $ch = $iy;
+        $clip = MImage::imageWithWidthHeight($cw, $ch);
+        $clip->copy($this, 0, 0, $ix, 0, $cw, $ch);
+        $clip->scale($sw, $iy);
+        $dst->copy($clip, $ix, 0, 0, 0, $clip->width(), $clip->height());
+
+        //  right
+        $cw = $rw;
+        $ch = $ih;
+        $clip = MImage::imageWithWidthHeight($cw, $ch);
+        $clip->copy($this, 0, 0, $ix + $iw, $iy, $cw, $ch);
+        $clip->scale($rw, $sh);
+        $dst->copy($clip, $ix + $sw, $iy, 0, 0, $clip->width(), $clip->height());
+
+        //  bottom
+        $cw = $iw;
+        $ch = $dh;
+        $clip = MImage::imageWithWidthHeight($cw, $ch);
+        $clip->copy($this, 0, 0, $ix, $iy + $ih, $cw, $ch);
+        $clip->scale($sw, $dh);
+        $dst->copy($clip, $ix, $iy + $sh, 0, 0, $clip->width(), $clip->height());
+
+        //  center
+        $cw = $iw;
+        $ch = $ih;
+        $clip = MImage::imageWithWidthHeight($cw, $ch);
+        $clip->copy($this, 0, 0, $ix, $iy, $cw, $ch);
+        $clip->scale($sw, $sh);
+        $dst->copy($clip, $ix, $iy, 0, 0, $clip->width(), $clip->height());
 
         $this->image = $dst->getImage();
     }
