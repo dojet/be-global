@@ -12,25 +12,38 @@ class MImage {
     protected $imagePathFile;
     protected $image;
 
-    function __construct($imagePathFile) {
+    function __construct($image) {
         DAssert::assert(extension_loaded('gd') || dl('gd'), 'gd lib not exist');
-        $this->imagePathFile = $imagePathFile;
+        DAssert::assert(is_resource($image), 'illegal image resource');
+        $this->image = $image;
     }
 
-    protected function getImage() {
-        if (!is_resource($this->image)) {
-            $imageData = file_get_contents($this->imagePathFile);
-            $this->image = imagecreatefromstring($imageData);
-        }
+    public static function imageFromFile($imagePathFile) {
+        DAssert::assertFileExists($imagePathFile);
+        $imageData = file_get_contents($imagePathFile);
+        $image = imagecreatefromstring($imageData);
+        return new MImage($image);
+    }
+
+    public static function imageWithWidthHeight($width, $height) {
+        $image = imagecreatetruecolor($width, $height);
+        return new MImage($image);
+    }
+
+    public static function image($image) {
+        return new MImage($image);
+    }
+
+    public function getImage() {
         return $this->image;
     }
 
     public function width() {
-        return imagesx($this->getImage());
+        return imagesx($this->image);
     }
 
     public function height() {
-        return imagesy($this->getImage());
+        return imagesy($this->image);
     }
 
     public function resize($width, $height) {
@@ -54,7 +67,7 @@ class MImage {
 
         $im = imagecreatetruecolor($width, $height);
 
-        if (!imagecopyresampled($im, $this->getImage(), 0, 0, $src_x, $src_y, $width, $height, $src_w, $src_h)) {
+        if (!imagecopyresampled($im, $this->image, 0, 0, $src_x, $src_y, $width, $height, $src_w, $src_h)) {
             throw new Exception("resize image fail", 1);
         }
 
@@ -65,16 +78,39 @@ class MImage {
      * 9宫格拉伸
      */
     public function resize9($width, $height, $ix, $iy, $iw, $ih) {
-        $im = imagecreatetruecolor($width, $height);
+        $dst = MImage::imageWithWidthHeight($width, $height);
+
+        //  left up
+        $dst->copy($this, 0, 0, 0, 0, $ix, $iy);
+
+        //  right up
+        $dst_x = $width - ($this->width() - $ix - $iw);
+        $dst_y = 0;
+        $src_x = $ix + $iw;
+        $src_y = 0;
+        $w = $this->width() - $src_x;
+        $h = $iy;
+        $dst->copy($this, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+
+        //  left down
+        $dst_x = 0;
+        $dst_y = $height - ($this->height() - $iy - $ih);
+        $src_x = 0;
+        $src_y = $iy + $ih;
+        $w = $ix;
+        $h = $this->height() - $src_y;
+        $dst->copy($this, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+
+        $this->image = $dst->getImage();
     }
 
     public function copy(MImage $src, $dst_x, $dst_y, $src_x, $src_y, $w, $h) {
-        $dst = $this->getImage();
-        return imagecopy($dst, $src->getImage(), $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+        $dst = $this->image;
+        return imagecopy($dst, $src->image, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
     }
 
     public function ttftext($text, $fontfile, $size, $x, $y, $angle = 0, $rgb = 0x000000) {
-        $image = $this->getImage();
+        $image = $this->image;
         $r = ($rgb >> 16) & 0xff;
         $g = ($rgb >> 8) & 0xff;
         $b = ($rgb >> 0) & 0xff;
@@ -83,12 +119,12 @@ class MImage {
     }
 
     public function saveTo($path, $quality = 75) {
-        imagejpeg($this->getImage(), $path, $quality);
+        imagejpeg($this->image, $path, $quality);
     }
 
     public function display() {
         header("Content-type: image/png");
-        imagepng($this->getImage());
+        imagepng($this->image);
     }
 
 }
