@@ -25,9 +25,17 @@ class MImage {
         return $this->image;
     }
 
+    public function width() {
+        return imagesx($this->getImage());
+    }
+
+    public function height() {
+        return imagesy($this->getImage());
+    }
+
     public function resize($width, $height) {
-        $iw = imagesx($this->getImage());
-        $ih = imagesy($this->getImage());
+        $iw = $this->width();
+        $ih = $this->height();
 
         $k1 = $iw / $ih;
         $k2 = $width / $height;
@@ -51,6 +59,13 @@ class MImage {
         }
 
         $this->image = $im;
+    }
+
+    /**
+     * 9宫格拉伸
+     */
+    public function resize9($width, $height, $ix, $iy, $iw, $ih) {
+        $im = imagecreatetruecolor($width, $height);
     }
 
     public function copy(MImage $src, $dst_x, $dst_y, $src_x, $src_y, $w, $h) {
