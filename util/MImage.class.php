@@ -46,6 +46,16 @@ class MImage {
         return imagesy($this->image);
     }
 
+    public function scale($width, $height) {
+        $im = imagecreatetruecolor($width, $height);
+
+        if (!imagecopyresampled($im, $this->image, 0, 0, 0, 0, $width, $height, $this->width(), $this->height())) {
+            throw new Exception("scale image fail", 1);
+        }
+
+        $this->image = $im;
+    }
+
     public function resize($width, $height) {
         $iw = $this->width();
         $ih = $this->height();
@@ -100,6 +110,23 @@ class MImage {
         $w = $ix;
         $h = $this->height() - $src_y;
         $dst->copy($this, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+
+        //  right down
+        $dst_x = $width - ($this->width() - $ix - $iw);
+        $dst_y = $height - ($this->height() - $iy - $ih);
+        $src_x = $ix + $iw;
+        $src_y = $iy + $ih;
+        $w = $this->width() - $src_x;
+        $h = $this->height() - $src_y;
+        $dst->copy($this, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+
+        //  left
+        $cw = $ix;
+        $ch = $ih;
+        $clip = MImage::imageWithWidthHeight($cw, $ch);
+        $clip->copy($this, 0, 0, 0, $iy, $cw, $ch);
+        $clip->scale($cw, $height - $this->height() + $ih);
+        $dst->copy($clip, 0, $iy, 0, 0, $clip->width(), $clip->height());
 
         $this->image = $dst->getImage();
     }
