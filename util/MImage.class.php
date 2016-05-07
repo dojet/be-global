@@ -54,6 +54,8 @@ class MImage {
         }
 
         $this->image = $im;
+
+        return $this;
     }
 
     public function resize($width, $height) {
@@ -82,6 +84,8 @@ class MImage {
         }
 
         $this->image = $im;
+
+        return $this;
     }
 
     /**
@@ -166,20 +170,22 @@ class MImage {
         $dst->copy($clip, $ix, $iy, 0, 0, $clip->width(), $clip->height());
 
         $this->image = $dst->getImage();
+
+        return $this;
     }
 
     public function copy(MImage $src, $dst_x, $dst_y, $src_x, $src_y, $w, $h) {
-        $dst = $this->image;
-        return imagecopy($dst, $src->image, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+        imagecopy($this->image, $src->image, $dst_x, $dst_y, $src_x, $src_y, $w, $h);
+        return $this;
     }
 
     public function ttftext($text, $fontfile, $size, $x, $y, $angle = 0, $rgb = 0x000000) {
-        $image = $this->image;
         $r = ($rgb >> 16) & 0xff;
         $g = ($rgb >> 8) & 0xff;
         $b = ($rgb >> 0) & 0xff;
-        $color = imagecolorallocate($image, $r, $g, $b);
-        return imagettftext($image, $size, $angle, $x, $y, $color, $fontfile, $text);
+        $color = imagecolorallocate($this->image, $r, $g, $b);
+        imagettftext($this->image, $size, $angle, $x, $y, $color, $fontfile, $text);
+        return $this;
     }
 
     public function saveTo($path, $quality = 75) {
