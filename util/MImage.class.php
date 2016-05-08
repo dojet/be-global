@@ -179,6 +179,10 @@ class MImage {
         return $this;
     }
 
+    public function copyfull(MImage $src, $dst_x, $dst_y) {
+        return $this->copy($src, $dst_x, $dst_y, 0, 0, $src->width(), $src->height());
+    }
+
     public function ttftext($text, $fontfile, $size, $x, $y, $angle = 0, $rgb = 0x000000) {
         $r = ($rgb >> 16) & 0xff;
         $g = ($rgb >> 8) & 0xff;
