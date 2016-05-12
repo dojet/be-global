@@ -184,12 +184,34 @@ class MImage {
     }
 
     public function ttftext($text, $fontfile, $size, $x, $y, $angle = 0, $rgb = 0x000000) {
+        $color = $this->rgb2color($rgb);
+        imagettftext($this->image, $size, $angle, $x, $y, $color, $fontfile, $text);
+        return $this;
+    }
+
+    public function filledrect($x1, $y1, $x2, $y2, $rgb = 0x000000) {
+        $color = $this->rgb2color($rgb);
+        imagefilledrectangle($this->image, $x1, $y1, $x2, $y2, $color);
+        return $this;
+    }
+
+    public function setpixel($x, $y, $rgb = 0x000000) {
+        $color = $this->rgb2color($rgb);
+        imagesetpixel($this->image, $x, $y, $color);
+        return $this;
+    }
+
+    public function line($x1, $y1, $x2, $y2, $rgb = 0x000000) {
+        $color = $this->rgb2color($rgb);
+        imageline($this->image, $x1, $y1, $x2, $y2, $color);
+        return $this;
+    }
+
+    private function rgb2color($rgb) {
         $r = ($rgb >> 16) & 0xff;
         $g = ($rgb >> 8) & 0xff;
         $b = ($rgb >> 0) & 0xff;
-        $color = imagecolorallocate($this->image, $r, $g, $b);
-        imagettftext($this->image, $size, $angle, $x, $y, $color, $fontfile, $text);
-        return $this;
+        return imagecolorallocate($this->image, $r, $g, $b);
     }
 
     public function saveTo($path, $quality = 75) {
