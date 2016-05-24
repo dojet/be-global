@@ -171,6 +171,27 @@ class DRedis {
         return $ret;
     }
 
+    //  hash
+    public static function hset($key, $field, $value) {
+        try {
+            $ret = self::getRedis()->hset(self::key($key), $field, $value);
+        } catch (Exception $e) {
+            Trace::warn(sprintf('redis %s failed. key:%s error:%s', __METHOD__, $key, $e->getMessage()));
+            throw $e;
+        }
+        return $ret;
+    }
+
+    public static function hget($key, $field) {
+        try {
+            $ret = self::getRedis()->hget(self::key($key), $field);
+        } catch (Exception $e) {
+            Trace::warn(sprintf('redis %s failed. key:%s error:%s', __METHOD__, $key, $e->getMessage()));
+            throw $e;
+        }
+        return $ret;
+    }
+
     //  set
     public static function sAdd($key, $member) {
         try {
