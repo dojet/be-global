@@ -168,14 +168,14 @@ class MCurl {
             $response = curl_exec($ch);
 
             if (false === $response) {
-                self::$error = MResult::result(curl_errno($ch), curl_error($ch));
+                self::$error = curl_errno($ch);
                 Trace::debug('curl error: '.curl_error($ch));
                 Trace::verbose('curl error: '.curl_error($ch));
                 Trace::debug('retry: '.$retry);
                 sleep($this->retrySleep);
                 $retry--;
             } else {
-                self::$error = MResult::result(MResult::SUCCESS);
+                self::$error = 0;
                 Trace::debug('response length: '.strlen($response));
                 Trace::verbose('response: '.var_export($response, true));
                 $retry = 0;
