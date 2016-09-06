@@ -20,8 +20,8 @@ class DBReadWrite {
         $config = Config::configForKeyPath($rw, $this->dbConfig);
         $connKey = md5(serialize(array($config, $dbAdapterClass)));
 
-        if (isset($connPool[$connKey])) {
-            $conn = $connPool[$connKey];
+        if (isset(self::$connPool[$connKey])) {
+            $conn = self::$connPool[$connKey];
         } else {
             DAssert::assert(class_exists($dbAdapterClass), 'illegal DBAdapter class name');
             $dbAdapter = new $dbAdapterClass;
@@ -29,7 +29,7 @@ class DBReadWrite {
 
             $dbConnection = new DBConnection($dbAdapter);
             $conn = $dbConnection->connect($config);
-            $connPool[$connKey] = $conn;
+            self::$connPool[$connKey] = $conn;
         }
 
         return $conn;

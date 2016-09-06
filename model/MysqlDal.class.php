@@ -157,29 +157,29 @@ abstract class MysqlDal {
         return $str;
     }
 
-    protected static function insertID($db = null, $rw = 'w') {
-        return static::doQuery("SELECT LAST_INSERT_ID()", $db, $rw);
+    public static function insertID($db = null, $rw = 'w') {
+        return static::rs2value("SELECT LAST_INSERT_ID()", $db, $rw);
     }
 
-    protected static function affectedRows($db = null, $rw = 'w') {
+    public static function affectedRows($db = null, $rw = 'w') {
         $dbQuery = static::getDBQuery($db, $rw);
         $ret = $dbQuery->affectedRows();
         return static::result($ret, $dbQuery);
     }
 
-    protected static function beginTransaction($db = null, $rw = 'w') {
+    public static function beginTransaction($db = null, $rw = 'w') {
         return static::doQuery('BEGIN', $db, $rw);
     }
 
-    protected static function endTransaction($db = null, $rw = 'w') {
+    public static function endTransaction($db = null, $rw = 'w') {
         return static::doQuery('END', $db, $rw);
     }
 
-    protected static function commit($db = null, $rw = 'w') {
+    public static function commit($db = null, $rw = 'w') {
         return static::doQuery('COMMIT', $db, $rw);
     }
 
-    protected static function rollback($db = null, $rw = 'w') {
+    public static function rollback($db = null, $rw = 'w') {
         return static::doQuery('ROLLBACK', $db, $rw);
     }
 
