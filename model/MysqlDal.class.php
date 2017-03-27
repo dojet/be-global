@@ -157,6 +157,12 @@ abstract class MysqlDal {
         return $str;
     }
 
+    protected static function wherein($fieldname, $numids) {
+        DAssert::assertNotEmptyNumericArray($numids);
+        $wherein = join(',', $numids);
+        return "$fieldname IN ($wherein)";
+    }
+
     public static function insertID($db = null, $rw = 'w') {
         return static::rs2value("SELECT LAST_INSERT_ID()", $db, $rw);
     }
