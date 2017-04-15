@@ -345,4 +345,49 @@ class DRedis {
         return $ret;
     }
 
+    //  zset
+    public static function zAdd($key, $score, $member) {
+        try {
+            $ret = self::getRedis()->zAdd(self::key($key), $score, $member);
+        } catch (Exception $e) {
+            Trace::warn('redis zAdd failed. key:'.$key.' error:'.$e->getMessage());
+            throw $e;
+        }
+        return $ret;
+    }
+
+    public static function zRangeByScore($key, $min, $max, $withscore = false, $offset = 0, $limit = 0x7fffffff) {
+        try {
+            $option = array(
+                'limit' => array($offset, $limit),
+                'withscore' => $withscore,
+            );
+            $ret = self::getRedis()->zrangebyscore(self::key($key), $min, $max, $option);
+        } catch (Exception $e) {
+            Trace::warn('redis '.__METHOD__.' failed. key:'.$key.' error:'.$e->getMessage());
+            throw $e;
+        }
+        return $ret;
+    }
+
+    public static function zRem($key, $member) {
+        try {
+            $ret = self::getRedis()->zrem(self::key($key), $member);
+        } catch (Exception $e) {
+            Trace::warn('redis '.__METHOD__.' failed. key:'.$key.' error:'.$e->getMessage());
+            throw $e;
+        }
+        return $ret;
+    }
+
+    public static function zCard($key) {
+        try {
+            $ret = self::getRedis()->zCard(self::key($key));
+        } catch (Exception $e) {
+            Trace::warn('redis '.__METHOD__.' failed. key:'.$key.' error:'.$e->getMessage());
+            throw $e;
+        }
+        return $ret;
+    }
+
 }

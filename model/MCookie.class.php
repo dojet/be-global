@@ -18,13 +18,4 @@ class MCookie {
         self::setCookie($key, null, 0, '/');
     }
 
-    public static function getFirstCookieByPre($pre) {
-    	foreach($_COOKIE as $name=>$value) {
-    		if(strpos($name, $pre) === 0){
-    			//Trace::debug('getFirstCookieByPre succcess, $value='.$value);
-    			return $value;
-    		}
-    	}
-    	return null;
-    }
 }
