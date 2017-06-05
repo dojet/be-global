@@ -6,7 +6,7 @@
  */
 class SOA {
 
-    public static function call($service, $method, $params) {
+    public static function call(ISOADelegate $delegate, $service, $method, $params) {
         try {
             $node = SOARegistry::getNode($service);
         } catch (Exception $e) {
@@ -20,7 +20,7 @@ class SOA {
         $soaResponse = self::resolveSOAResponse($response);
         DAssert::assert($soaResponse instanceof SOAResponse, 'illegal soa response');
 
-        return $soaResponse;
+        $delegate->didReceivedResponse($soaResponse);
     }
 
     protected static function sendSOARequest($url, $params) {
