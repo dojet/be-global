@@ -26,7 +26,7 @@ class SOARegistry {
         for ($retry = 0; $retry < $nodeCount; $retry++) {
             $nodeKey = DRedis::sRandMember($registerKey);
             $nodeJson = DRedis::get($nodeKey);
-            if (is_null($nodeJson)) {
+            if (!$nodeJson) {
                 self::removeNodeKey($registerKey, $nodeKey);
                 continue;
             }

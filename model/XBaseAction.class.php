@@ -11,13 +11,13 @@ abstract class XBaseAction extends BaseAction {
 
     protected $arrHeader;
 
-    function __construct() {
-        parent::__construct();
+    function __construct(WebService $webService) {
+        parent::__construct($webService);
         $this->arrHeader = array();
     }
 
     protected function templatePrefix($template) {
-        return PRJ.'template/';
+        return $this->webService()->root().'template/';
     }
 
     protected function displayTemplate($template) {

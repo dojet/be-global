@@ -5,6 +5,7 @@
  */
 interface ISOADelegate {
 
-    public function didReceivedResponse(SOAResponse $response);
+    public function didReceivedSOAResponse(SOAResponse $response);
+    public function receivedSOAError($errmsg);
 
 }

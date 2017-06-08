@@ -6,27 +6,36 @@
  */
 class SOA {
 
-    public static function call(ISOADelegate $delegate, $service, $method, $params) {
-        try {
-            $node = SOARegistry::getNode($service);
-        } catch (Exception $e) {
-            throw $e;
-        }
+    public static function call(ISOADelegate $delegate, $service, $method, $params, $context = null) {
+        // try {
+        //     $node = SOARegistry::getNode($service);
+        // } catch (Exception $e) {
+        //     throw $e;
+        // }
 
-        $domain = $node->domain();
-        $url = sprintf("%s/%s", $service, $method);
+        // $domain = $node->domain();
+        // $url = sprintf("%s/%s", $domain, $method);
+        $url = self::getSOARequestUrl($service, $method);
 
         $response = self::sendSOARequest($url, $params);
-        $soaResponse = self::resolveSOAResponse($response);
+        try {
+            $soaResponse = self::resolveSOAResponse($response);
+        } catch (Exception $e) {
+            return $delegate->receivedSOAError($e->getMessage());
+        }
+
         DAssert::assert($soaResponse instanceof SOAResponse, 'illegal soa response');
 
-        $delegate->didReceivedResponse($soaResponse);
+        $delegate->didReceivedSOAResponse($soaResponse, $context);
+    }
+
+    protected static function getSOARequestUrl($service, $method) {
+        return Config::runtimeConfigForKeyPath(sprintf('soa.service.%s.$.%s', $service, $method));
     }
 
     protected static function sendSOARequest($url, $params) {
         DAssert::assert(is_array($params), 'illegal soa params, must be array');
-        $postFields = array('params' => json_encode($params));
-        $curl = MCurl::curlPostRequest($url, $postFields);
+        $curl = MCurl::curlPostRequest($url, json_encode($params));
         $response = $curl->sendRequest();
         return $response;
     }

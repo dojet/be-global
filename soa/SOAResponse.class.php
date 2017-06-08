@@ -21,9 +21,11 @@ class SOAResponse {
 
     public static function responseFromJson($json) {
         $info = json_decode($json, true);
-        DAssert::assert(array_key_exists('errno', $info), 'illegal soa response json');
-        DAssert::assert(array_key_exists('message', $info), 'illegal soa response json');
-        DAssert::assert(array_key_exists('data', $info), 'illegal soa response json');
+        if (!array_key_exists('errno', $info) ||
+            !array_key_exists('message', $info) ||
+            !array_key_exists('data', $info) ||
+            throw new Exception("illegal soa response json", 1);
+        }
         return new SOAResponse($info['errno'], $info['message'], $info['data']);
     }
 
