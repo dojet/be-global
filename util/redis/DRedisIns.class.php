@@ -93,9 +93,27 @@ class DRedisIns {
         return $this->process($cmd);
     }
 
-    public function cluster_nodes() {
-        $cmd = ["CLUSTER", "NODES"];
+    protected function cluster($subcmd) {
+        $cmd = ["CLUSTER", $subcmd];
         return $this->process($cmd);
+    }
+
+    public function cluster_nodes() {
+        return $this->cluster("NODES");
+    }
+
+    public function cluster_info() {
+        return $this->cluster("INFO");
+    }
+
+    public function cluster_meet($ip, $port) {
+        $cmd = ["CLUSTER", "MEET", $ip, $port];
+        try {
+            $this->process($cmd);
+        } catch (DRedisException $e) {
+            return $e->getMessage();
+        }
+        return false;
     }
 
     public function scan($cursor) {

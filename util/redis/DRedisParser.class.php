@@ -12,6 +12,7 @@ class DRedisParser {
     public static function parse($recv) {
         $reply = explode("\r\n", $recv);
         array_pop($reply);
+        var_dump($reply);
         $parser = new DRedisParser();
         return $parser->parseReply($reply);
     }
@@ -33,7 +34,6 @@ class DRedisParser {
                 throw DRedisException::ReplyStatusException(substr($line, 1));
                 break;
             case '-':
-                // throw RedisException::ReplyErrorException(substr($line, 1));
                 throw DRedisException::ReplyErrorException(substr($line, 1));
                 break;
             default:

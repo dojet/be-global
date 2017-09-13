@@ -1,5 +1,5 @@
 .tags*
 tags
 tags_*
-.DS_Store
+*.DS_Store
 .svn

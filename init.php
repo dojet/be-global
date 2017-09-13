@@ -1,4 +1,5 @@
 <?php
+define("GLUTIL", __DIR__.'/util/');
 
 DAutoloader::getInstance()->addAutoloadPathArray(
     array(
