@@ -89,7 +89,12 @@ class DRedisIns {
     }
 
     public function set($key, $value) {
-        $cmd = ["SET", $key, $value, 1];
+        $cmd = ["SET", $key, $value];
+        return $this->process($cmd);
+    }
+
+    public function scard($key) {
+        $cmd = ["SCARD", $key];
         return $this->process($cmd);
     }
 
@@ -104,6 +109,10 @@ class DRedisIns {
 
     public function cluster_info() {
         return $this->cluster("INFO");
+    }
+
+    public function cluster_slots() {
+        return $this->cluster("SLOTS");
     }
 
     public function cluster_meet($ip, $port) {

@@ -9,63 +9,81 @@
  */
 class DRedisParser {
 
-    public static function parse($recv) {
-        $reply = explode("\r\n", $recv);
-        array_pop($reply);
-        var_dump($reply);
-        $parser = new DRedisParser();
-        return $parser->parseReply($reply);
+    private $pos = 0;
+    private $recv = '';
+    private $reply;
+
+    function __construct($recv) {
+        $this->recv = $recv;
     }
 
-    public function parseReply(&$reply) {
-        while (list($key, $line) = each($reply)) {
-            $what = $line{0};
-            switch ($what) {
-            case '*':
-                return $this->multiBulkReply($reply);
-                break;
-            case '$':
-                return $this->bulkReply($reply);
-                break;
-            case ':':
-                return $this->integerReply($reply);
-                break;
-            case '+':
-                throw DRedisException::ReplyStatusException(substr($line, 1));
-                break;
-            case '-':
-                throw DRedisException::ReplyErrorException(substr($line, 1));
-                break;
-            default:
-                throw new Exception("unknown reply", 1);
-            }
+    protected function read($n) {
+        $out = substr($this->recv, $this->pos, $n);
+        $this->pos+= $n;
+        return $out;
+    }
+
+    protected function readUntil($find) {
+        $end = strpos($this->recv, $find, $this->pos);
+        return $this->read($end - $this->pos);
+    }
+
+    protected function readline() {
+        $out = $this->readUntil("\r\n");
+        $this->pos+= 2;
+        return $out;
+    }
+
+    public static function parse($recv) {
+        $parser = new DRedisParser($recv);
+        return $parser->parseReply();
+    }
+
+    public function parseReply() {
+        $what = $this->read(1);
+        switch ($what) {
+        case '*':
+            return $this->multiBulkReply();
+            break;
+        case '$':
+            return $this->bulkReply();
+            break;
+        case ':':
+            return $this->integerReply();
+            break;
+        case '+':
+            throw DRedisException::ReplyStatusException(substr($this->recv, $this->pos));
+            break;
+        case '-':
+            throw DRedisException::ReplyErrorException(substr($this->recv, $this->pos));
+            break;
+        default:
+            throw new Exception("unknown reply", 1);
         }
         throw new Exception("parse reply error", 1);
     }
 
-    protected function bulkReply(&$reply) {
-        $line = array_shift($reply);
-        $len = (int)substr($line, 1);
-        $line = array_shift($reply);
+    protected function bulkReply() {
+        $len = $this->readline();
         if ($len == -1) {
             return false;
         }
-        return substr($line, 0, $len);
+        $bulk = $this->read($len);
+        $this->pos+= strlen("\r\n");
+        return $bulk;
     }
 
-    protected function multiBulkReply(&$reply) {
+    protected function multiBulkReply() {
         $bulks = [];
-        $line = array_shift($reply);
-        $size = (int)substr($line, 1);
+        $size = (int)$this->readline();
         for ($i = 0; $i < $size; $i++) {
-            $bulks[] = $this->parseReply($reply);
+            $bulks[] = $this->parseReply();
         }
         return $bulks;
     }
 
-    protected function integerReply(&$reply) {
-        $line = array_shift($reply);
-        return (int)substr($line, 1);
+    protected function integerReply() {
+        return (int)$this->readline();
     }
 
 }
