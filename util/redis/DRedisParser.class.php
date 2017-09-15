@@ -58,7 +58,8 @@ class DRedisParser {
             throw DRedisException::ReplyErrorException(substr($this->recv, $this->pos));
             break;
         default:
-            throw new Exception("unknown reply", 1);
+            var_dump($this->recv, $this->pos, substr($this->recv, $this->pos));
+            throw new Exception("unknown reply ", 1);
         }
         throw new Exception("parse reply error", 1);
     }
