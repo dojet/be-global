@@ -47,7 +47,7 @@ class DRedisIns {
         $address = $this->conf('address');
         $port = $this->conf('port');
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        $result = socket_connect($this->socket, $address, $port);
+        $result = @socket_connect($this->socket, $address, $port);
         if (false === $result) {
             throw new Exception("socket connect failed", 1);
         }
@@ -68,7 +68,13 @@ class DRedisIns {
     }
 
     protected function read() {
-        return socket_read($this->socket, 2048);
+        $buf = $resp = '';
+        $length = 2048;
+        do {
+            $buf = socket_read($this->socket, $length);
+            $resp.= $buf;
+        } while (strlen($buf) == $length);
+        return $resp;
     }
 
     protected function buildAndWrite($cmd) {
@@ -81,6 +87,22 @@ class DRedisIns {
         $recv = $this->read();
         $reply = DRedisParser::parse($recv);
         return $reply;
+    }
+
+    function __call($method, $args) {
+        $callback = [$this, '_'.$method];
+        if (!is_callable($callback)) {
+            return;
+        }
+
+        try {
+            return call_user_func_array($callback, $args);
+        } catch (DRedisException $e) {
+            if ($e->getCode() === DRedisException::REPLY_STATUS) {
+                return true;
+            }
+            throw $e;
+        }
     }
 
     public function get($key) {
@@ -125,8 +147,18 @@ class DRedisIns {
         return false;
     }
 
+    public function _cluster_forget($node_id) {
+        $cmd = ["CLUSTER", "FORGET", $node_id];
+        return $this->process($cmd);
+    }
+
     public function scan($cursor) {
         $cmd = ["SCAN", $cursor];
+        return $this->process($cmd);
+    }
+
+    public function info() {
+        $cmd = ["INFO"];
         return $this->process($cmd);
     }
 
