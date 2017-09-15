@@ -152,6 +152,12 @@ class DRedisIns {
         return $this->process($cmd);
     }
 
+    public function _cluster_addslots($slots) {
+        $cmd = ["CLUSTER", "ADDSLOTS"];
+        $cmd = array_merge($cmd, $slots);
+        return $this->process($cmd);
+    }
+
     public function scan($cursor) {
         $cmd = ["SCAN", $cursor];
         return $this->process($cmd);
