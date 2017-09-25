@@ -64,6 +64,11 @@ class DRedisIns {
     }
 
     protected function write($cmdstr) {
+        Trace::debug('>>> send to redis');
+        Trace::debug(str_replace(["\r", "\n"], ['\r', '\n'], $cmdstr));
+        Trace::debug(join(" ", array_map(function($e) {
+            return sprintf("%02X", ord($e));
+        }, str_split($cmdstr))));
         return socket_write($this->socket, $cmdstr, strlen($cmdstr));
     }
 
@@ -72,6 +77,16 @@ class DRedisIns {
         $length = 2048;
         do {
             $buf = socket_read($this->socket, $length);
+
+            // ===============
+            Trace::debug('>>> recv from redis');
+            Trace::debug('type of buf : '.gettype($buf));
+            Trace::debug(str_replace(["\r", "\n"], ['\r', '\n'], $buf));
+            Trace::debug(join(" ", array_map(function($e) {
+                return sprintf("%02X", ord($e));
+            }, str_split($buf))));
+            // ===============
+
             $resp.= $buf;
         } while (strlen($buf) == $length);
         return $resp;
@@ -137,7 +152,7 @@ class DRedisIns {
         return $this->cluster("SLOTS");
     }
 
-    public function cluster_meet($ip, $port) {
+    public function _cluster_meet($ip, $port) {
         $cmd = ["CLUSTER", "MEET", $ip, $port];
         try {
             $this->process($cmd);

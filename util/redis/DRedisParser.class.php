@@ -18,7 +18,14 @@ class DRedisParser {
     }
 
     protected function read($n) {
+        Trace::debug("redis read ========");
+        Trace::debug("redis read $n bytes");
         $out = substr($this->recv, $this->pos, $n);
+        Trace::debug("content: [$out]");
+        $hex = array_map(function($e) {
+            return sprintf("%x", ord($e));
+        }, str_split($out));
+        Trace::debug("hex: [".join(" ", $hex)."]");
         $this->pos+= $n;
         return $out;
     }
@@ -30,7 +37,8 @@ class DRedisParser {
 
     protected function readline() {
         $out = $this->readUntil("\r\n");
-        $this->pos+= 2;
+        $this->read(2);
+        // $this->pos+= 2;
         return $out;
     }
 
@@ -58,9 +66,21 @@ class DRedisParser {
             throw DRedisException::ReplyErrorException(substr($this->recv, $this->pos));
             break;
         default:
+            $this->dumpError();
             throw new Exception("unknown reply ", 1);
         }
         throw new Exception("parse reply error", 1);
+    }
+
+    protected function dumpError() {
+        Trace::fatal('redis parser error begin =================');
+        $hex = array_map(function($e) {
+            return sprintf("%02X", ord($e));
+        }, str_split($this->recv));
+        Trace::fatal("recv: ".$this->recv);
+        Trace::fatal("pos: ".$this->pos);
+        Trace::fatal("hex: [".join(" ", $hex)."]");
+        Trace::fatal('redis parser error end   =================');
     }
 
     protected function bulkReply() {
