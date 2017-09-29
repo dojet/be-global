@@ -37,8 +37,7 @@ class DRedisParser {
 
     protected function readline() {
         $out = $this->readUntil("\r\n");
-        $this->read(2);
-        // $this->pos+= 2;
+        $this->read(strlen("\r\n"));
         return $out;
     }
 

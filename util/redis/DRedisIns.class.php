@@ -125,7 +125,7 @@ class DRedisIns {
         return $this->process($cmd);
     }
 
-    public function set($key, $value) {
+    public function _set($key, $value) {
         $cmd = ["SET", $key, $value];
         return $this->process($cmd);
     }
@@ -136,23 +136,28 @@ class DRedisIns {
     }
 
     protected function cluster($subcmd) {
-        $cmd = ["CLUSTER", $subcmd];
+        $cmd = array_merge(["CLUSTER"], func_get_args());
         return $this->process($cmd);
     }
 
-    public function _cluster_nodes() {
+    protected function _cluster_nodes() {
         return $this->cluster("NODES");
     }
 
-    public function _cluster_info() {
+    protected function _cluster_info() {
         return $this->cluster("INFO");
     }
 
-    public function _cluster_slots() {
+    protected function _cluster_slots() {
         return $this->cluster("SLOTS");
     }
 
-    public function _cluster_meet($ip, $port) {
+    protected function _cluster_reset($type) {
+        $cmd = ["CLUSTER", "RESET", $type];
+        return $this->process($cmd);
+    }
+
+    protected function _cluster_meet($ip, $port) {
         $cmd = ["CLUSTER", "MEET", $ip, $port];
         try {
             $this->process($cmd);
@@ -162,24 +167,24 @@ class DRedisIns {
         return false;
     }
 
-    public function _cluster_forget($node_id) {
+    protected function _cluster_forget($node_id) {
         $cmd = ["CLUSTER", "FORGET", $node_id];
         return $this->process($cmd);
     }
 
-    public function _cluster_addslots($slots) {
+    protected function _cluster_addslots($slots) {
         $cmd = ["CLUSTER", "ADDSLOTS"];
         $cmd = array_merge($cmd, $slots);
         return $this->process($cmd);
     }
 
-    public function _cluster_delslots($slots) {
+    protected function _cluster_delslots($slots) {
         $cmd = ["CLUSTER", "DELSLOTS"];
         $cmd = array_merge($cmd, $slots);
         return $this->process($cmd);
     }
 
-    public function _cluster_setslot($slot, $semantic) {
+    protected function _cluster_setslot($slot, $semantic) {
         $cmd = ["CLUSTER", "SETSLOT", $slot, $semantic];
         if (func_num_args() > 2) {
             $args = func_get_args();
@@ -188,30 +193,37 @@ class DRedisIns {
         return $this->process($cmd);
     }
 
-    public function _cluster_countkeysinslot($slot) {
+    protected function _cluster_countkeysinslot($slot) {
         $cmd = ["CLUSTER", "COUNTKEYSINSLOT", $slot];
         return $this->process($cmd);
     }
 
-    public function _cluster_getkeysinslot($slot, $count) {
-        $cmd = ["CLUSTER", "GETKEYSINSLOT", $slot, $count];
-        return $this->process($cmd);
+    protected function _cluster_getkeysinslot($slot, $count) {
+        return $this->cluster("GETKEYSINSLOT", $slot, $count);
     }
 
-    public function _scan($cursor) {
+    protected function _cluster_keyslot($key) {
+        return $this->cluster('KEYSLOT', $key);
+    }
+
+    protected function _scan($cursor) {
         $cmd = ["SCAN", $cursor];
         return $this->process($cmd);
     }
 
-    public function _info() {
+    protected function _info() {
         $cmd = ["INFO"];
         return $this->process($cmd);
     }
 
-    public function _migrate($host, $port, $key, $destination_db, $timeout) {
+    protected function _migrate($host, $port, $key, $destination_db, $timeout) {
         $cmd = ["MIGRATE", $host, $port, $key, $destination_db, $timeout];
         return $this->process($cmd);
     }
 
-}
+    protected function _replicate($master_node_id) {
+        $cmd = ['CLUSTER', 'REPLICATE', $master_node_id];
+        return $this->process($cmd);
+    }
 
+}
