@@ -1,7 +1,5 @@
 <?php
 /**
- * dal base
- *
  * Filename: DRedisParser.class.php
  *
  * @author liyan
@@ -12,12 +10,17 @@ class DRedisParser {
     private $pos = 0;
     private $recv = '';
     private $reply;
+    private $reader;
 
-    function __construct($recv) {
-        $this->recv = $recv;
+    function __construct(IRedisReader $reader) {
+        // $this->recv = $recv;
+        $this->reader = $reader;
     }
 
     protected function read($n) {
+        if ($this->pos >= strlen($this->recv)) {
+            $this->recv.= $this->reader->read();
+        }
         Trace::debug("redis read ========");
         Trace::debug("redis read $n bytes");
         $out = substr($this->recv, $this->pos, $n);
@@ -41,8 +44,8 @@ class DRedisParser {
         return $out;
     }
 
-    public static function parse($recv) {
-        $parser = new DRedisParser($recv);
+    public static function parse(IRedisReader $reader) {
+        $parser = new DRedisParser($reader);
         return $parser->parseReply();
     }
 
@@ -73,12 +76,18 @@ class DRedisParser {
 
     protected function dumpError() {
         Trace::fatal('redis parser error begin =================');
+        $p = 0;
         $hex = array_map(function($e) {
-            return sprintf("%02X", ord($e));
+            global $p;
+            $fmt = "%02X";
+            if ($p++ == $this->pos) {
+                $fmt = "->%02X";
+            }
+            return sprintf($fmt, ord($e));
         }, str_split($this->recv));
         Trace::fatal("recv: ".$this->recv);
         Trace::fatal("pos: ".$this->pos);
-        Trace::fatal("hex: [".join(" ", $hex)."]");
+        Trace::fatal("hex: [".join("  ", $hex)."]");
         Trace::fatal('redis parser error end   =================');
     }
 

@@ -5,7 +5,7 @@
  * @author liyan
  * @since 2017 9 12
  */
-class DRedisIns {
+class DRedisIns implements IRedisReader {
 
     protected static $single;
     protected $config;
@@ -47,6 +47,8 @@ class DRedisIns {
         $address = $this->conf('address');
         $port = $this->conf('port');
         $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        socket_set_option($this->socket,SOL_SOCKET,SO_RCVTIMEO,array("sec"=>1, "usec"=>0 ) );
+        socket_set_option($this->socket,SOL_SOCKET,SO_SNDTIMEO,array("sec"=>3, "usec"=>0 ) );
         $result = @socket_connect($this->socket, $address, $port);
         if (false === $result) {
             throw new Exception("socket connect failed", 1);
@@ -72,7 +74,7 @@ class DRedisIns {
         return socket_write($this->socket, $cmdstr, strlen($cmdstr));
     }
 
-    protected function read() {
+    public function read() {
         $buf = $resp = '';
         $length = 2048;
         do {
@@ -99,8 +101,8 @@ class DRedisIns {
 
     protected function process($cmd) {
         $this->buildAndWrite($cmd);
-        $recv = $this->read();
-        $reply = DRedisParser::parse($recv);
+        // $recv = $this->read();
+        $reply = DRedisParser::parse($this);
         return $reply;
     }
 
