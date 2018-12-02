@@ -1,7 +1,7 @@
 <?php
 define("GLUTIL", __DIR__.'/util/');
 
-DAutoloader::getInstance()->addAutoloadPathArray(
+Autoloader::getInstance()->addAutoloadPath(
     array(
         __DIR__.'/lib/',
         __DIR__.'/model/',
