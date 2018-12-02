@@ -7,7 +7,7 @@
  * @author liyan
  * @since 2016 8 22
  */
-class MysqlProxy extends MysqlDal {
+class MysqlProxy {
 
     protected static $db;
 
@@ -21,6 +21,10 @@ class MysqlProxy extends MysqlDal {
 
     public static function rs2rowline($sql, $db = null, $rw = 'r') {
         return parent::rs2rowline($sql, $db, $rw);
+    }
+
+    public static function rs2value($sql, $db = null, $rw = 'r') {
+        return parent::rs2value($sql, $db, $rw);
     }
 
     public static function doInsert($table, $fields_values, $db = null, $rw = 'w') {

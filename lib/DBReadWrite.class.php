@@ -15,9 +15,9 @@ class DBReadWrite {
     }
 
     public function getConnection($dbAdapterClass, $rw = 'w') {
-        DAssert::assert(in_array($rw, array('r', 'w')), 'illegal rw');
+        $rw = $rw === 'w' ? 'w' : 'r';
 
-        $config = Config::configForKeyPath($rw, $this->dbConfig);
+        $config = Config::c($rw, $this->dbConfig);
         $connKey = md5(serialize(array($config, $dbAdapterClass)));
 
         if (isset(self::$connPool[$connKey])) {

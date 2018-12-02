@@ -24,7 +24,7 @@ abstract class MysqlDal {
         DAssert::assert(!is_null($db), 'db should not be null! class:'.get_called_class());
         DAssert::assert(in_array($rw, array('r', 'w')), 'illegal rw');
 
-        $dbConfig = Config::runtimeConfigForKeyPath('database.$.'.$db);
+        $dbConfig = Config::rc('database.$.'.$db);
         $dbReadWrite = new DBReadWrite($dbConfig);
         $dbConnection = $dbReadWrite->getConnection('DBMysqli', $rw);
         $dbQuery = new DBQuery($dbConnection);
