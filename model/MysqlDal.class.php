@@ -26,7 +26,7 @@ abstract class MysqlDal {
 
         $dbConfig = Config::rc('database.$.'.$db);
         $dbReadWrite = new DBReadWrite($dbConfig);
-        $dbConnection = $dbReadWrite->getConnection('DBMysqli', $rw);
+        $dbConnection = $dbReadWrite->getConnection('DBMysql', $rw);
         $dbQuery = new DBQuery($dbConnection);
 
         return $dbQuery;

@@ -24,7 +24,7 @@ class DBReadWrite {
             $conn = self::$connPool[$connKey];
         } else {
             DAssert::assert(class_exists($dbAdapterClass), 'illegal DBAdapter class name');
-            $dbAdapter = new $dbAdapterClass;
+            $dbAdapter = new $dbAdapterClass($config);
             DAssert::assert($dbAdapter instanceof DBAdapter, 'dbAdapterClass must be DBAdapter');
 
             $dbConnection = new DBConnection($dbAdapter);
