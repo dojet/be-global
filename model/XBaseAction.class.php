@@ -17,7 +17,7 @@ abstract class XBaseAction extends BaseAction {
     }
 
     protected function templatePrefix($template) {
-        return $this->webService()->root().'template/';
+        return $this->webService->root().'template/';
     }
 
     protected function displayTemplate($template) {
