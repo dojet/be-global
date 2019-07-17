@@ -20,9 +20,13 @@ abstract class XBaseAction extends BaseAction {
         return $this->webService->root().'template/';
     }
 
-    protected function displayTemplate($template) {
+    protected function fullTemplate($template) {
         $prefix = $this->templatePrefix($template);
-        $template = $prefix.$template;
+        return $prefix.$template;
+    }
+
+    protected function displayTemplate($template) {
+        $template = $this->fullTemplate($template);
         return $this->display($template);
     }
 

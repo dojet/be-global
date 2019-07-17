@@ -138,7 +138,7 @@ abstract class MysqlDal {
         return self::rs2value($sql, $db, $rw);
     }
 
-    protected static function rs2foundrows($db = null, $rw = 'r') {
+    public static function rs2foundrows($db = null, $rw = 'r') {
         return self::rs2value("SELECT FOUND_ROWS()", $db, $rw);
     }
 
