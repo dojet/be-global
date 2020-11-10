@@ -23,7 +23,7 @@ class MRuntime {
 
     public static function setRuntime($newRuntime) {
         Trace::debug('set runtime:'.$newRuntime, __FILE__, __LINE__);
-        $currentRuntime = &Config::configRefForKeyPath('runtime');
+        $currentRuntime = &Config::rc('runtime');
         $currentRuntime = $newRuntime;
     }
 
